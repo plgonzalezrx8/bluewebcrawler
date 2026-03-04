@@ -1,0 +1,64 @@
+name: CI
+
+on:
+  # Validate all pushed commits so branch health is visible immediately.
+  push:
+  # Validate PR changes before merge.
+  pull_request:
+
+concurrency:
+  # Cancel superseded runs on the same ref to save CI time.
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test-build:
+    name: Lint, Test, Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Run unit and integration tests
+        run: npm run test
+
+      - name: Build
+        run: npm run build
+
+  browser-integration:
+    name: Browser Integration Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Run JS-render integration test
+        env:
+          RUN_BROWSER_TESTS: "1"
+        run: npm run test -- tests/integration/js-crawl.test.ts
