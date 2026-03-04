@@ -2,6 +2,8 @@
 
 BlueWebCrawler is a `Node + TypeScript` command-line crawler that maps a site and exports AI-ready markdown.
 
+![BlueWebCrawler Logo](./assets/logo/bluewebcrawler-logo-maximalist-4k.png)
+
 It supports hybrid crawling:
 - Fast HTTP-first fetching for normal pages.
 - Playwright browser escalation for JS-rendered pages.
