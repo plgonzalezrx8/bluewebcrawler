@@ -22,15 +22,55 @@ It supports hybrid crawling:
 ## Requirements
 
 - Node.js `>= 20`
-- npm
+- npm `>= 10`
 - Playwright browser binaries (for JS-rendered pages)
+
+## Installation
+
+1. Clone the repository:
+
+```bash
+git clone https://github.com/<your-org>/bluewebcrawler.git
+cd bluewebcrawler
+```
+
+2. Install Node dependencies:
+
+```bash
+npm ci
+```
+
+3. Install Playwright Chromium runtime:
+
+```bash
+npx playwright install chromium
+```
+
+4. Build the CLI:
+
+```bash
+npm run build
+```
+
+5. Verify installation:
+
+```bash
+npm run lint
+npm run test
+```
+
+If your environment does not have Node 20 yet, install it first (for example with `nvm`):
+
+```bash
+nvm install 20
+nvm use 20
+node -v
+npm -v
+```
 
 ## Quickstart
 
 ```bash
-npm install
-npx playwright install chromium
-npm run build
 npm run crawl -- https://example.com
 ```
 
