@@ -59,6 +59,22 @@ npm install -g bluewebcrawler
 bluewebcrawler crawl https://example.com
 ```
 
+## Dependency Note (Important)
+
+`npm` installs this package dependencies automatically (everything listed in `dependencies`), including the `playwright` npm package.
+
+If you still get Playwright runtime errors (for example, missing Chromium executable), install browser binaries manually:
+
+```bash
+npx playwright install chromium
+```
+
+For Linux CI/containers that also need system libraries:
+
+```bash
+npx playwright install --with-deps chromium
+```
+
 ## Run From Source (Clone + Build)
 
 ```bash
