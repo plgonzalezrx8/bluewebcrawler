@@ -27,40 +27,6 @@ It supports hybrid crawling:
 - npm `>= 10`
 - Playwright browser binaries (for JS-rendered pages)
 
-## Installation
-
-1. Clone the repository:
-
-```bash
-git clone https://github.com/<your-org>/bluewebcrawler.git
-cd bluewebcrawler
-```
-
-2. Install Node dependencies:
-
-```bash
-npm ci
-```
-
-3. Install Playwright Chromium runtime:
-
-```bash
-npx playwright install chromium
-```
-
-4. Build the CLI:
-
-```bash
-npm run build
-```
-
-5. Verify installation:
-
-```bash
-npm run lint
-npm run test
-```
-
 If your environment does not have Node 20 yet, install it first (for example with `nvm`):
 
 ```bash
@@ -70,9 +36,47 @@ node -v
 npm -v
 ```
 
-## Quickstart
+## Quick Install (npx)
+
+Run directly without installing globally:
 
 ```bash
+npx bluewebcrawler crawl https://example.com
+```
+
+For JS-rendered pages, install Chromium once on your machine:
+
+```bash
+npx playwright install chromium
+```
+
+## Global Install (npm)
+
+Install globally and run as a normal command:
+
+```bash
+npm install -g bluewebcrawler
+bluewebcrawler crawl https://example.com
+```
+
+## Run From Source (Clone + Build)
+
+```bash
+git clone https://github.com/plgonzalezrx8/bluewebcrawler.git
+cd bluewebcrawler
+npm ci
+```
+
+Install Playwright Chromium runtime when you need JS-rendered crawling:
+
+```bash
+npx playwright install chromium
+```
+
+Build and run:
+
+```bash
+npm run build
 npm run crawl -- https://example.com
 ```
 
@@ -88,18 +92,12 @@ Output is written to `./output` by default:
 bluewebcrawler crawl <url> [options]
 ```
 
-For local development:
-
-```bash
-npm run crawl -- https://example.com --max-pages 200 --verbose
-```
-
 ## Common Recipes
 
 ### Full crawl with explicit limits
 
 ```bash
-npm run crawl -- https://example.com \
+bluewebcrawler crawl https://example.com \
   --max-pages 1500 \
   --max-depth 8 \
   --max-duration 3600
@@ -108,13 +106,13 @@ npm run crawl -- https://example.com \
 ### Sitemap-only disabled
 
 ```bash
-npm run crawl -- https://example.com --sitemap off
+bluewebcrawler crawl https://example.com --sitemap off
 ```
 
 ### Strict robots compliance with conservative concurrency
 
 ```bash
-npm run crawl -- https://example.com --respect-robots true --concurrency 2
+bluewebcrawler crawl https://example.com --respect-robots true --concurrency 2
 ```
 
 ## Configuration File
@@ -143,13 +141,7 @@ Create `crawler.config.json` in your project root and provide it via `--config`.
 
 CLI flags override config file values.
 
-## Continuous Integration
-
-GitHub Actions runs on every `push` and `pull_request` using `.github/workflows/ci.yml`:
-- `Lint, Test, Build` job runs `npm run lint`, `npm run test`, and `npm run build`.
-- `Browser Integration Tests` job installs Playwright Chromium and runs `tests/integration/js-crawl.test.ts` with `RUN_BROWSER_TESTS=1`.
-
-## Development
+## Development (Contributors)
 
 ```bash
 npm run lint
@@ -162,6 +154,55 @@ Browser integration tests are opt-in:
 ```bash
 RUN_BROWSER_TESTS=1 npm run test
 ```
+
+## Publishing Checklist (Maintainers)
+
+First release target from the original `0.1.0` state: `0.1.1`.
+
+1. Run release checks locally.
+
+```bash
+npm run release:check
+```
+
+2. Confirm pack output only contains runtime artifacts:
+- `dist/**`
+- `README.md`
+- `LICENSE`
+- `package.json`
+
+3. Set release version and tag.
+
+```bash
+npm version patch
+```
+
+4. Push commit and tag.
+
+```bash
+git push origin main --follow-tags
+```
+
+5. Authenticate and publish.
+
+```bash
+npm login
+npm publish
+```
+
+6. Verify install and runtime.
+
+```bash
+npm view bluewebcrawler version
+npx bluewebcrawler --version
+npx bluewebcrawler crawl https://example.com --max-pages 1
+```
+
+## Continuous Integration
+
+GitHub Actions runs on every `push` and `pull_request` using `.github/workflows/ci.yml`:
+- `Lint, Test, Build` job runs `npm run lint`, `npm run test`, and `npm run build`.
+- `Browser Integration Tests` job installs Playwright Chromium and runs `tests/integration/js-crawl.test.ts` with `RUN_BROWSER_TESTS=1`.
 
 ## Docs
 

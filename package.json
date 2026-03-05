@@ -1,21 +1,29 @@
 {
   "name": "bluewebcrawler",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A hybrid HTTP + browser web crawler that exports AI-ready markdown.",
   "type": "module",
   "bin": {
     "bluewebcrawler": "./dist/cli/index.js"
   },
   "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist/**",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
-    "clean": "rm -rf dist output coverage",
+    "clean": "rm -rf dist output output-* coverage",
     "dev": "tsx src/cli/index.ts",
     "crawl": "tsx src/cli/index.ts crawl",
     "test": "vitest run",
     "test:watch": "vitest",
     "lint": "tsc -p tsconfig.json --noEmit",
-    "typecheck": "tsc -p tsconfig.build.json --noEmit"
+    "typecheck": "tsc -p tsconfig.build.json --noEmit",
+    "prepack": "npm run clean && npm run build",
+    "release:check": "npm run lint && npm run test && npm run build && npm pack --dry-run"
   },
   "keywords": [
     "crawler",
