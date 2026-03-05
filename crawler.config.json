@@ -13,5 +13,17 @@
   "render": { "strategy": "hybrid", "waitUntil": "networkidle", "fallbackTimeoutMs": 20000 },
   "format": "markdown+json",
   "userAgent": "bluewebcrawler/0.1 (+https://github.com/)",
-  "verbose": false
+  "verbose": false,
+  "security": {
+    "promptInjection": {
+      "mode": "redact",
+      "threshold": 3
+    },
+    "outputEncoding": {
+      "mode": "ascii-escape",
+      "normalize": "NFKC",
+      "stripControlChars": true,
+      "stripBidiControls": true
+    }
+  }
 }

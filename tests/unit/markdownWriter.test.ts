@@ -27,6 +27,12 @@ describe("writePageMarkdown", () => {
       timestamp: new Date("2026-03-04T00:00:00.000Z").toISOString(),
       depth: 1,
       discoveredFrom: "https://example.com",
+      security: {
+        promptInjectionScore: 0,
+        promptInjectionMatches: 0,
+        action: "none",
+        matchedRules: [],
+      },
     });
 
     const absolutePath = join(outputPaths.outputDir, relativePath);

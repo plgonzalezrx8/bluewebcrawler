@@ -23,6 +23,9 @@ bluewebcrawler crawl <url> [options]
 - `--user-agent <string>`: custom user agent.
 - `--sitemap <auto|off|url>`: sitemap discovery mode. Default `auto`.
 - `--format <markdown|markdown+json>`: output mode. Default `markdown+json`.
+- `--prompt-injection-mode <off|detect|redact|drop>`: prompt-injection handling policy. Default `redact`.
+- `--prompt-injection-threshold <n>`: score threshold used by `drop` mode. Default `3`.
+- `--output-encoding <utf8|ascii-escape|ascii-transliterate|ascii-strip>`: output text encoding policy. Default `ascii-escape`.
 - `--verbose`: verbose structured logs.
 
 ## Precedence Rules
@@ -54,4 +57,12 @@ npm run crawl -- https://example.com --config ./crawler.config.json
 npm run crawl -- https://example.com \
   --query-policy allowlist \
   --query-allowlist page,lang
+```
+
+### Security hardening with explicit policy
+
+```bash
+npm run crawl -- https://example.com \
+  --prompt-injection-mode redact \
+  --output-encoding ascii-escape
 ```

@@ -29,6 +29,18 @@ export const crawlConfigSchema = z.object({
   format: z.enum(["markdown", "markdown+json"]),
   userAgent: z.string().min(1),
   verbose: z.boolean(),
+  security: z.object({
+    promptInjection: z.object({
+      mode: z.enum(["off", "detect", "redact", "drop"]),
+      threshold: z.number().int().nonnegative(),
+    }),
+    outputEncoding: z.object({
+      mode: z.enum(["utf8", "ascii-escape", "ascii-transliterate", "ascii-strip"]),
+      normalize: z.literal("NFKC"),
+      stripControlChars: z.boolean(),
+      stripBidiControls: z.boolean(),
+    }),
+  }),
 });
 
 export type CrawlConfigSchema = z.infer<typeof crawlConfigSchema>;

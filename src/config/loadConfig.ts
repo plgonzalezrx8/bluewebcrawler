@@ -68,6 +68,33 @@ export async function loadConfig(cli: CliOptions): Promise<CrawlConfig> {
     format: cli.format ?? fileConfig.format ?? DEFAULT_CRAWL_CONFIG.format,
     userAgent: cli.userAgent ?? fileConfig.userAgent ?? DEFAULT_CRAWL_CONFIG.userAgent,
     verbose: cli.verbose ?? fileConfig.verbose ?? DEFAULT_CRAWL_CONFIG.verbose,
+    security: {
+      promptInjection: {
+        mode:
+          cli.promptInjectionMode ??
+          fileConfig.security?.promptInjection?.mode ??
+          DEFAULT_CRAWL_CONFIG.security.promptInjection.mode,
+        threshold:
+          cli.promptInjectionThreshold ??
+          fileConfig.security?.promptInjection?.threshold ??
+          DEFAULT_CRAWL_CONFIG.security.promptInjection.threshold,
+      },
+      outputEncoding: {
+        mode:
+          cli.outputEncoding ??
+          fileConfig.security?.outputEncoding?.mode ??
+          DEFAULT_CRAWL_CONFIG.security.outputEncoding.mode,
+        normalize:
+          fileConfig.security?.outputEncoding?.normalize ??
+          DEFAULT_CRAWL_CONFIG.security.outputEncoding.normalize,
+        stripControlChars:
+          fileConfig.security?.outputEncoding?.stripControlChars ??
+          DEFAULT_CRAWL_CONFIG.security.outputEncoding.stripControlChars,
+        stripBidiControls:
+          fileConfig.security?.outputEncoding?.stripBidiControls ??
+          DEFAULT_CRAWL_CONFIG.security.outputEncoding.stripBidiControls,
+      },
+    },
   };
 
   const parsed = crawlConfigSchema.safeParse(merged);

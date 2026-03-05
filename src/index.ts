@@ -9,7 +9,11 @@ export type {
   CrawlResult,
   CrawlSummary,
   PageResult,
+  PageSecurityMetadata,
+  CrawlSecurityConfig,
   QueryPolicy,
   ResourceKind,
   FetchMode,
+  PromptInjectionMode,
+  OutputEncodingMode,
 } from "./types.js";

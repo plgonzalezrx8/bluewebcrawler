@@ -18,6 +18,9 @@ export interface CliOptions {
   sitemap?: string;
   format?: "markdown" | "markdown+json";
   verbose?: boolean;
+  promptInjectionMode?: "off" | "detect" | "redact" | "drop";
+  promptInjectionThreshold?: number;
+  outputEncoding?: "utf8" | "ascii-escape" | "ascii-transliterate" | "ascii-strip";
 }
 
 /**

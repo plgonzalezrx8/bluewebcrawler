@@ -34,6 +34,19 @@ async function main(): Promise<void> {
     .option("--user-agent <string>", "HTTP user agent")
     .option("--sitemap <auto|off|url>", "Sitemap mode or explicit sitemap URL")
     .option("--format <format>", "Output format: markdown|markdown+json")
+    .option(
+      "--prompt-injection-mode <mode>",
+      "Prompt injection handling: off|detect|redact|drop",
+    )
+    .option(
+      "--prompt-injection-threshold <n>",
+      "Prompt injection score threshold for drop mode",
+      parseIntOption,
+    )
+    .option(
+      "--output-encoding <mode>",
+      "Output encoding: utf8|ascii-escape|ascii-transliterate|ascii-strip",
+    )
     .option("--verbose", "Enable verbose structured logs", false)
     .action(async (url: string, options: CliOptions) => {
       const runtimeConfig = await loadConfig(options);

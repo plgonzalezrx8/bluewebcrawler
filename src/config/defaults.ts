@@ -29,4 +29,16 @@ export const DEFAULT_CRAWL_CONFIG: CrawlConfig = {
   format: "markdown+json",
   userAgent: "bluewebcrawler/0.1 (+https://github.com/)",
   verbose: false,
+  security: {
+    promptInjection: {
+      mode: "redact",
+      threshold: 3,
+    },
+    outputEncoding: {
+      mode: "ascii-escape",
+      normalize: "NFKC",
+      stripControlChars: true,
+      stripBidiControls: true,
+    },
+  },
 };

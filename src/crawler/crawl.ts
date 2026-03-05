@@ -4,6 +4,7 @@ import type {
   CrawlResult,
   ExtractedContent,
   PageResult,
+  PageSecurityMetadata,
   ResourceKind,
   UrlRecord,
 } from "../types.js";
@@ -28,6 +29,12 @@ import {
 } from "../output/markdownWriter.js";
 import { writeManifest } from "../output/manifestWriter.js";
 import { Logger } from "../logging/logger.js";
+import {
+  sanitizeErrorForOutput,
+  sanitizePageForOutput,
+  sanitizeSummaryForOutput,
+  type RawPageForOutput,
+} from "../security/sanitizeOutputFields.js";
 
 const MAX_RETRIES = 2;
 
@@ -49,6 +56,12 @@ export async function runCrawl(startUrl: string, config: CrawlConfig): Promise<C
   const queue = new CrawlQueue();
   const errors: CrawlError[] = [];
   const pages: PageResult[] = [];
+  const securityTotals = {
+    pagesFlagged: 0,
+    pagesRedacted: 0,
+    pagesDropped: 0,
+    totalPromptInjectionMatches: 0,
+  };
 
   const robots = new RobotsManager();
   const browserRenderer = new BrowserRenderer();
@@ -145,6 +158,19 @@ export async function runCrawl(startUrl: string, config: CrawlConfig): Promise<C
           batchFailures += 1;
         }
 
+        if (result.security) {
+          securityTotals.totalPromptInjectionMatches += result.security.promptInjectionMatches;
+          if (result.security.action === "flagged") {
+            securityTotals.pagesFlagged += 1;
+          }
+          if (result.security.action === "redacted") {
+            securityTotals.pagesRedacted += 1;
+          }
+          if (result.security.action === "dropped") {
+            securityTotals.pagesDropped += 1;
+          }
+        }
+
         if (result.page) {
           pages.push(result.page);
         }
@@ -174,26 +200,31 @@ export async function runCrawl(startUrl: string, config: CrawlConfig): Promise<C
     pagesDiscovered: queue.discoveredCount,
     pagesWritten: pages.length,
     errors: errors.length,
+    security: securityTotals,
   };
+
+  // Sanitize final summary/errors for ASCII-safe persisted artifacts.
+  const sanitizedSummary = sanitizeSummaryForOutput(summary, runtimeConfig.security);
+  const sanitizedErrors = errors.map((error) => sanitizeErrorForOutput(error, runtimeConfig.security));
 
   await writeIndexMarkdown({
     outputDir: outputPaths.outputDir,
-    summary,
+    summary: sanitizedSummary,
     pages,
   });
-  await writeErrorsMarkdown(outputPaths.outputDir, errors);
+  await writeErrorsMarkdown(outputPaths.outputDir, sanitizedErrors);
 
   const crawlResult: CrawlResult = {
-    summary,
+    summary: sanitizedSummary,
     pages,
-    errors,
+    errors: sanitizedErrors,
   };
 
   if (runtimeConfig.format === "markdown+json") {
     await writeManifest(outputPaths.outputDir, crawlResult);
   }
 
-  logger.info("crawl_finished", summary);
+  logger.info("crawl_finished", sanitizedSummary as unknown as Record<string, unknown>);
   return crawlResult;
 }
 
@@ -208,7 +239,7 @@ async function processRecord(
   browserRenderer: BrowserRenderer,
   queue: CrawlQueue,
   logger: Logger,
-): Promise<{ page?: PageResult; errors: CrawlError[] }> {
+): Promise<{ page?: PageResult; errors: CrawlError[]; security?: PageSecurityMetadata }> {
   const errors: CrawlError[] = [];
 
   if (config.respectRobots) {
@@ -356,7 +387,7 @@ async function processRecord(
     }
   }
 
-  const page: PageResult = {
+  const rawPage: RawPageForOutput = {
     url: record.url,
     finalUrl,
     status: fetched.status,
@@ -372,6 +403,26 @@ async function processRecord(
     discoveredFrom: record.discoveredFrom,
   };
 
+  // Preserve crawl behavior on raw content, then sanitize only persisted artifacts.
+  const sanitizedDecision = sanitizePageForOutput(rawPage, config.security);
+  if (sanitizedDecision.dropped || !sanitizedDecision.page) {
+    errors.push({
+      url: record.url,
+      stage: "security",
+      errorCode: "SECURITY_PROMPT_INJECTION_DROPPED",
+      message: "Page dropped due to prompt injection risk threshold",
+      retriable: false,
+      attempts: 1,
+      timestamp: new Date().toISOString(),
+    });
+    return {
+      errors,
+      security: sanitizedDecision.security,
+    };
+  }
+
+  const page = sanitizedDecision.page;
+
   try {
     page.outputFile = await writePageMarkdown(config.output, page);
   } catch (error) {
@@ -386,7 +437,11 @@ async function processRecord(
     });
   }
 
-  return { page, errors };
+  return {
+    page,
+    errors,
+    security: sanitizedDecision.security,
+  };
 }
 
 /**

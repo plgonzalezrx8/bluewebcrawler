@@ -75,6 +75,30 @@ For Linux CI/containers that also need system libraries:
 npx playwright install --with-deps chromium
 ```
 
+## Security Safeguards (Default On)
+
+BlueWebCrawler treats crawled content as untrusted input.
+
+Default behavior:
+- prompt-injection policy: `redact`
+- prompt-injection drop threshold (for `drop` mode): `3`
+- output encoding: `ascii-escape`
+- Unicode normalization: `NFKC`
+- control and bidi direction characters removed
+
+Useful overrides:
+
+```bash
+# Detect only (no redaction)
+bluewebcrawler crawl https://example.com --prompt-injection-mode detect
+
+# Strict drop mode
+bluewebcrawler crawl https://example.com --prompt-injection-mode drop --prompt-injection-threshold 5
+
+# Keep raw Unicode output (less strict)
+bluewebcrawler crawl https://example.com --output-encoding utf8
+```
+
 ## Run From Source (Clone + Build)
 
 ```bash
@@ -151,7 +175,16 @@ Create `crawler.config.json` in your project root and provide it via `--config`.
   "render": { "strategy": "hybrid", "waitUntil": "networkidle", "fallbackTimeoutMs": 20000 },
   "format": "markdown+json",
   "userAgent": "bluewebcrawler/0.1 (+https://github.com/)",
-  "verbose": false
+  "verbose": false,
+  "security": {
+    "promptInjection": { "mode": "redact", "threshold": 3 },
+    "outputEncoding": {
+      "mode": "ascii-escape",
+      "normalize": "NFKC",
+      "stripControlChars": true,
+      "stripBidiControls": true
+    }
+  }
 }
 ```
 

@@ -7,7 +7,33 @@ export type ResourceKind = "html" | "pdf" | "xml" | "text" | "other";
 
 export type FetchMode = "http" | "browser";
 
-export type CrawlErrorStage = "robots" | "fetch" | "render" | "extract" | "write";
+export type CrawlErrorStage = "robots" | "fetch" | "render" | "extract" | "write" | "security";
+
+export type PromptInjectionMode = "off" | "detect" | "redact" | "drop";
+
+export type OutputEncodingMode = "utf8" | "ascii-escape" | "ascii-transliterate" | "ascii-strip";
+
+export interface CrawlSecurityConfig {
+  promptInjection: {
+    mode: PromptInjectionMode;
+    threshold: number;
+  };
+  outputEncoding: {
+    mode: OutputEncodingMode;
+    normalize: "NFKC";
+    stripControlChars: boolean;
+    stripBidiControls: boolean;
+  };
+}
+
+export type PageSecurityAction = "none" | "flagged" | "redacted" | "dropped";
+
+export interface PageSecurityMetadata {
+  promptInjectionScore: number;
+  promptInjectionMatches: number;
+  action: PageSecurityAction;
+  matchedRules: string[];
+}
 
 export interface CrawlConfig {
   output: string;
@@ -35,6 +61,7 @@ export interface CrawlConfig {
   format: "markdown" | "markdown+json";
   userAgent: string;
   verbose: boolean;
+  security: CrawlSecurityConfig;
 }
 
 export interface UrlRecord {
@@ -59,6 +86,7 @@ export interface PageResult {
   depth: number;
   discoveredFrom?: string;
   outputFile?: string;
+  security: PageSecurityMetadata;
 }
 
 export interface CrawlError {
@@ -81,6 +109,12 @@ export interface CrawlSummary {
   pagesDiscovered: number;
   pagesWritten: number;
   errors: number;
+  security: {
+    pagesFlagged: number;
+    pagesRedacted: number;
+    pagesDropped: number;
+    totalPromptInjectionMatches: number;
+  };
 }
 
 export interface CrawlResult {

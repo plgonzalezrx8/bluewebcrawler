@@ -30,23 +30,28 @@ Then markdown sections:
 - `## Summary`
 - `## Extracted Text`
 - `## Discovered Links`
+- `## Security Signals`
 
 ## Index (`index.md`)
 
 Includes:
 - crawl metadata and totals
 - run metadata (`run_id`, output root, run output directory)
+- security totals (`pagesFlagged`, `pagesRedacted`, `pagesDropped`, `totalPromptInjectionMatches`)
 - markdown table rows with
   - URL
   - resource kind
   - fetch mode
   - status
+  - security action
+  - prompt injection score
+  - prompt injection matches
   - output file path
 
 ## Errors (`errors.md`)
 
 Includes:
-- counts grouped by stage (`robots`, `fetch`, `render`, `extract`, `write`)
+- counts grouped by stage (`robots`, `fetch`, `render`, `extract`, `write`, `security`)
 - per-error entries with
   - URL
   - stage
@@ -61,7 +66,15 @@ Includes:
 Generated when format is `markdown+json`.
 Contains:
 - `summary` (includes `runId`, `outputRoot`, and `outputDir`)
-- `pages[]`
+- `summary.security` counters for prompt-injection outcomes
+- `pages[]` (includes per-page `security` metadata)
 - `errors[]`
 
 This is intended for machine consumers and automation pipelines.
+
+## Encoding Safety
+
+With default `ascii-escape` output encoding:
+- persisted artifacts contain only ASCII characters
+- non-ASCII characters are represented as `\\uXXXX` sequences
+- control and bidi/invisible direction characters are removed
