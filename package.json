@@ -4,7 +4,7 @@
   "description": "A hybrid HTTP + browser web crawler that exports AI-ready markdown.",
   "type": "module",
   "bin": {
-    "bluewebcrawler": "./dist/cli/index.js"
+    "bluewebcrawler": "dist/cli/index.js"
   },
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
