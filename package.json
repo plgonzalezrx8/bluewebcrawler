@@ -1,6 +1,6 @@
 {
   "name": "bluewebcrawler",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "A hybrid HTTP + browser web crawler that exports AI-ready markdown.",
   "type": "module",
   "bin": {
