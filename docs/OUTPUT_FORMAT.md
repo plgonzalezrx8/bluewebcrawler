@@ -4,11 +4,12 @@
 
 ```text
 output/
-  index.md
-  errors.md
-  manifest.json
-  pages/
-    <slug-hash>.md
+  run-<timestamp>/
+    index.md
+    errors.md
+    manifest.json
+    pages/
+      <slug-hash>.md
 ```
 
 ## Per-Page Markdown (`pages/*.md`)
@@ -34,6 +35,7 @@ Then markdown sections:
 
 Includes:
 - crawl metadata and totals
+- run metadata (`run_id`, output root, run output directory)
 - markdown table rows with
   - URL
   - resource kind
@@ -58,7 +60,7 @@ Includes:
 
 Generated when format is `markdown+json`.
 Contains:
-- `summary`
+- `summary` (includes `runId`, `outputRoot`, and `outputDir`)
 - `pages[]`
 - `errors[]`
 

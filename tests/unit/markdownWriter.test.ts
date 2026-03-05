@@ -11,9 +11,9 @@ import { ensureOutputStructure } from "../../src/output/pathUtils.js";
 describe("writePageMarkdown", () => {
   it("writes a markdown file with expected frontmatter keys", async () => {
     const out = await mkdtemp(join(tmpdir(), "bluewebcrawler-md-"));
-    await ensureOutputStructure(out);
+    const outputPaths = await ensureOutputStructure(out, new Date("2026-03-04T00:00:00.000Z"));
 
-    const relativePath = await writePageMarkdown(out, {
+    const relativePath = await writePageMarkdown(outputPaths.outputDir, {
       url: "https://example.com/docs",
       finalUrl: "https://example.com/docs",
       status: 200,
@@ -29,7 +29,7 @@ describe("writePageMarkdown", () => {
       discoveredFrom: "https://example.com",
     });
 
-    const absolutePath = join(out, relativePath);
+    const absolutePath = join(outputPaths.outputDir, relativePath);
     const content = await readFile(absolutePath, "utf8");
 
     expect(relativePath.startsWith("pages/")).toBe(true);

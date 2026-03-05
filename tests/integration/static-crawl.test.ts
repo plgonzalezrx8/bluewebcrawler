@@ -74,11 +74,13 @@ describe("runCrawl static site", () => {
     expect(result.pages.some((page) => page.finalUrl.includes("/about"))).toBe(true);
     expect(result.pages.some((page) => page.finalUrl.includes("/sitemap-page"))).toBe(true);
     expect(result.pages.some((page) => page.finalUrl.includes("/blocked"))).toBe(false);
+    expect(result.summary.outputRoot).toBe(outputDir);
+    expect(result.summary.outputDir.startsWith(outputDir)).toBe(true);
 
-    await expect(stat(join(outputDir, "index.md"))).resolves.toBeDefined();
-    await expect(stat(join(outputDir, "errors.md"))).resolves.toBeDefined();
+    await expect(stat(join(result.summary.outputDir, "index.md"))).resolves.toBeDefined();
+    await expect(stat(join(result.summary.outputDir, "errors.md"))).resolves.toBeDefined();
 
-    const index = await readFile(join(outputDir, "index.md"), "utf8");
+    const index = await readFile(join(result.summary.outputDir, "index.md"), "utf8");
     expect(index).toContain("# Crawl Index");
   });
 });

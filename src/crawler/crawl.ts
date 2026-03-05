@@ -39,17 +39,23 @@ export async function runCrawl(startUrl: string, config: CrawlConfig): Promise<C
   const startedAt = new Date();
   const deadline = startedAt.getTime() + config.maxDurationSeconds * 1000;
 
+  // Resolve a dedicated run folder so every crawl keeps isolated artifacts.
+  const outputPaths = await ensureOutputStructure(config.output, startedAt);
+  const runtimeConfig: CrawlConfig = {
+    ...config,
+    output: outputPaths.outputDir,
+  };
+
   const queue = new CrawlQueue();
   const errors: CrawlError[] = [];
   const pages: PageResult[] = [];
 
   const robots = new RobotsManager();
   const browserRenderer = new BrowserRenderer();
-  await ensureOutputStructure(config.output);
 
   const normalizedStart = normalizeUrl(startUrl, {
-    queryPolicy: config.queryPolicy,
-    queryAllowlist: config.queryAllowlist,
+    queryPolicy: runtimeConfig.queryPolicy,
+    queryAllowlist: runtimeConfig.queryAllowlist,
   });
 
   queue.enqueue({
@@ -61,10 +67,10 @@ export async function runCrawl(startUrl: string, config: CrawlConfig): Promise<C
 
   const sitemapUrls = await discoverUrlsFromSitemap({
     startUrl: normalizedStart,
-    sitemapSetting: config.sitemap,
-    requestTimeoutMs: config.timeouts.requestMs,
-    userAgent: config.userAgent,
-    config,
+    sitemapSetting: runtimeConfig.sitemap,
+    requestTimeoutMs: runtimeConfig.timeouts.requestMs,
+    userAgent: runtimeConfig.userAgent,
+    config: runtimeConfig,
   });
 
   for (const sitemapUrl of sitemapUrls) {
@@ -79,21 +85,26 @@ export async function runCrawl(startUrl: string, config: CrawlConfig): Promise<C
   logger.info("crawl_started", {
     startUrl: normalizedStart,
     sitemapUrls: sitemapUrls.length,
+    runId: outputPaths.runId,
+    outputDir: outputPaths.outputDir,
   });
 
-  let dynamicConcurrency = config.concurrency.min;
+  let dynamicConcurrency = runtimeConfig.concurrency.min;
 
   try {
-    while (queue.size > 0 && pages.length < config.maxPages) {
+    while (queue.size > 0 && pages.length < runtimeConfig.maxPages) {
       if (Date.now() > deadline) {
         logger.warn("crawl_stopped_deadline", {
-          maxDurationSeconds: config.maxDurationSeconds,
+          maxDurationSeconds: runtimeConfig.maxDurationSeconds,
         });
         break;
       }
 
       const batch: UrlRecord[] = [];
-      const availableSlots = Math.max(1, Math.min(dynamicConcurrency, config.maxPages - pages.length));
+      const availableSlots = Math.max(
+        1,
+        Math.min(dynamicConcurrency, runtimeConfig.maxPages - pages.length),
+      );
 
       for (let i = 0; i < availableSlots; i += 1) {
         const next = queue.dequeue();
@@ -101,7 +112,7 @@ export async function runCrawl(startUrl: string, config: CrawlConfig): Promise<C
           break;
         }
 
-        if (next.depth > config.maxDepth) {
+        if (next.depth > runtimeConfig.maxDepth) {
           continue;
         }
 
@@ -113,7 +124,17 @@ export async function runCrawl(startUrl: string, config: CrawlConfig): Promise<C
       }
 
       const batchResults = await Promise.all(
-        batch.map((record) => processRecord(record, normalizedStart, config, robots, browserRenderer, queue, logger)),
+        batch.map((record) =>
+          processRecord(
+            record,
+            normalizedStart,
+            runtimeConfig,
+            robots,
+            browserRenderer,
+            queue,
+            logger,
+          ),
+        ),
       );
 
       let batchFailures = 0;
@@ -129,7 +150,7 @@ export async function runCrawl(startUrl: string, config: CrawlConfig): Promise<C
         }
       }
 
-      dynamicConcurrency = tuneConcurrency(dynamicConcurrency, config, batch.length, batchFailures);
+      dynamicConcurrency = tuneConcurrency(dynamicConcurrency, runtimeConfig, batch.length, batchFailures);
       logger.debug("batch_processed", {
         batchSize: batch.length,
         batchFailures,
@@ -147,17 +168,20 @@ export async function runCrawl(startUrl: string, config: CrawlConfig): Promise<C
     startUrl: normalizedStart,
     startedAt: startedAt.toISOString(),
     finishedAt: finishedAt.toISOString(),
+    outputRoot: outputPaths.outputRoot,
+    outputDir: outputPaths.outputDir,
+    runId: outputPaths.runId,
     pagesDiscovered: queue.discoveredCount,
     pagesWritten: pages.length,
     errors: errors.length,
   };
 
   await writeIndexMarkdown({
-    outputDir: config.output,
+    outputDir: outputPaths.outputDir,
     summary,
     pages,
   });
-  await writeErrorsMarkdown(config.output, errors);
+  await writeErrorsMarkdown(outputPaths.outputDir, errors);
 
   const crawlResult: CrawlResult = {
     summary,
@@ -165,8 +189,8 @@ export async function runCrawl(startUrl: string, config: CrawlConfig): Promise<C
     errors,
   };
 
-  if (config.format === "markdown+json") {
-    await writeManifest(config.output, crawlResult);
+  if (runtimeConfig.format === "markdown+json") {
+    await writeManifest(outputPaths.outputDir, crawlResult);
   }
 
   logger.info("crawl_finished", summary);

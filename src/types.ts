@@ -75,6 +75,9 @@ export interface CrawlSummary {
   startUrl: string;
   startedAt: string;
   finishedAt: string;
+  outputRoot: string;
+  outputDir: string;
+  runId: string;
   pagesDiscovered: number;
   pagesWritten: number;
   errors: number;

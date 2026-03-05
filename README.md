@@ -77,10 +77,10 @@ npm run crawl -- https://example.com
 ```
 
 Output is written to `./output` by default:
-- `output/index.md`
-- `output/errors.md`
-- `output/pages/*.md`
-- `output/manifest.json` (when format is `markdown+json`)
+- `output/run-<timestamp>/index.md`
+- `output/run-<timestamp>/errors.md`
+- `output/run-<timestamp>/pages/*.md`
+- `output/run-<timestamp>/manifest.json` (when format is `markdown+json`)
 
 ## CLI Usage
 

@@ -40,7 +40,7 @@ async function main(): Promise<void> {
       const result = await runCrawl(url, runtimeConfig);
 
       process.stdout.write(
-        `Crawl complete: pages=${result.summary.pagesWritten} errors=${result.summary.errors} output=${runtimeConfig.output}\n`,
+        `Crawl complete: pages=${result.summary.pagesWritten} errors=${result.summary.errors} output=${result.summary.outputDir}\n`,
       );
     });
 

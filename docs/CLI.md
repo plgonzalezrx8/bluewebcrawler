@@ -9,7 +9,7 @@ bluewebcrawler crawl <url> [options]
 ## Options
 
 - `--config <path>`: path to JSON config file.
-- `--output <dir>`: output directory. Default `./output`.
+- `--output <dir>`: output root directory. Each crawl writes to `run-<timestamp>` under this root. Default `./output`.
 - `--max-pages <n>`: max written pages. Default `1000`.
 - `--max-depth <n>`: max crawl depth. Default `6`.
 - `--max-duration <seconds>`: crawl time limit. Default `1800`.
