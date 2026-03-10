@@ -22,7 +22,7 @@ It supports hybrid crawling:
 ## Requirements
 
 - Node.js `>= 20`
-- npm `>= 10`
+- pnpm `>= 10`
 - Playwright browser binaries (for JS-rendered pages)
 
 ## Installation
@@ -37,26 +37,26 @@ cd bluewebcrawler
 2. Install Node dependencies:
 
 ```bash
-npm ci
+pnpm install
 ```
 
 3. Install Playwright Chromium runtime:
 
 ```bash
-npx playwright install chromium
+pnpm exec playwright install chromium
 ```
 
 4. Build the CLI:
 
 ```bash
-npm run build
+pnpm build
 ```
 
 5. Verify installation:
 
 ```bash
-npm run lint
-npm run test
+pnpm lint
+pnpm test
 ```
 
 If your environment does not have Node 20 yet, install it first (for example with `nvm`):
@@ -65,13 +65,13 @@ If your environment does not have Node 20 yet, install it first (for example wit
 nvm install 20
 nvm use 20
 node -v
-npm -v
+pnpm -v
 ```
 
 ## Quickstart
 
 ```bash
-npm run crawl -- https://example.com
+pnpm crawl -- https://example.com
 ```
 
 Output is written to `./output` by default:
@@ -89,7 +89,7 @@ bluewebcrawler crawl <url> [options]
 For local development:
 
 ```bash
-npm run crawl -- https://example.com --max-pages 200 --verbose
+pnpm crawl -- https://example.com --max-pages 200 --verbose
 ```
 
 ## Common Recipes
@@ -97,7 +97,7 @@ npm run crawl -- https://example.com --max-pages 200 --verbose
 ### Full crawl with explicit limits
 
 ```bash
-npm run crawl -- https://example.com \
+pnpm crawl -- https://example.com \
   --max-pages 1500 \
   --max-depth 8 \
   --max-duration 3600
@@ -106,13 +106,13 @@ npm run crawl -- https://example.com \
 ### Sitemap-only disabled
 
 ```bash
-npm run crawl -- https://example.com --sitemap off
+pnpm crawl -- https://example.com --sitemap off
 ```
 
 ### Strict robots compliance with conservative concurrency
 
 ```bash
-npm run crawl -- https://example.com --respect-robots true --concurrency 2
+pnpm crawl -- https://example.com --respect-robots true --concurrency 2
 ```
 
 ## Configuration File
@@ -144,21 +144,21 @@ CLI flags override config file values.
 ## Continuous Integration
 
 GitHub Actions runs on every `push` and `pull_request` using `.github/workflows/ci.yml`:
-- `Lint, Test, Build` job runs `npm run lint`, `npm run test`, and `npm run build`.
+- `Lint, Test, Build` job runs `pnpm lint`, `pnpm test`, and `pnpm build`.
 - `Browser Integration Tests` job installs Playwright Chromium and runs `tests/integration/js-crawl.test.ts` with `RUN_BROWSER_TESTS=1`.
 
 ## Development
 
 ```bash
-npm run lint
-npm run test
-npm run build
+pnpm lint
+pnpm test
+pnpm build
 ```
 
 Browser integration tests are opt-in:
 
 ```bash
-RUN_BROWSER_TESTS=1 npm run test
+RUN_BROWSER_TESTS=1 pnpm test
 ```
 
 ## Docs

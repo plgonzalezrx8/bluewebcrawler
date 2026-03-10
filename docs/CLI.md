@@ -39,19 +39,19 @@ CLI flags always win.
 ### Basic run
 
 ```bash
-npm run crawl -- https://example.com
+pnpm crawl -- https://example.com
 ```
 
 ### Config-driven run
 
 ```bash
-npm run crawl -- https://example.com --config ./crawler.config.json
+pnpm crawl -- https://example.com --config ./crawler.config.json
 ```
 
 ### Keep only selected query keys
 
 ```bash
-npm run crawl -- https://example.com \
+pnpm crawl -- https://example.com \
   --query-policy allowlist \
   --query-allowlist page,lang
 ```

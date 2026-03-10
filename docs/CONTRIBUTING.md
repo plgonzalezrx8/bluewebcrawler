@@ -3,16 +3,16 @@
 ## Development Setup
 
 ```bash
-npm install
-npx playwright install chromium
+pnpm install
+pnpm exec playwright install chromium
 ```
 
 ## Core Commands
 
 ```bash
-npm run lint
-npm run test
-npm run build
+pnpm lint
+pnpm test
+pnpm build
 ```
 
 ## Coding Standards

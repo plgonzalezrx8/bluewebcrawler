@@ -8,11 +8,11 @@ Symptoms:
 Checks:
 1. Install Playwright browser binaries:
    ```bash
-   npx playwright install chromium
+   pnpm exec playwright install chromium
    ```
 2. Increase render timeout:
    ```bash
-   npm run crawl -- https://example.com --render-timeout 45000
+   pnpm crawl -- https://example.com --render-timeout 45000
    ```
 
 ## Crawl Stops Early
@@ -23,11 +23,11 @@ Symptoms:
 Checks:
 1. Increase depth/page limits:
    ```bash
-   npm run crawl -- https://example.com --max-depth 10 --max-pages 5000
+   pnpm crawl -- https://example.com --max-depth 10 --max-pages 5000
    ```
 2. Increase duration:
    ```bash
-   npm run crawl -- https://example.com --max-duration 7200
+   pnpm crawl -- https://example.com --max-duration 7200
    ```
 
 ## Missing Pages Because of Robots
@@ -38,7 +38,7 @@ Symptoms:
 Action:
 - Keep default for compliance, or override in controlled environments:
   ```bash
-  npm run crawl -- https://example.com --respect-robots false
+  pnpm crawl -- https://example.com --respect-robots false
   ```
 
 ## Too Many Near-Duplicate URLs
@@ -49,7 +49,7 @@ Symptoms:
 Action:
 - Keep default `drop` or use allowlist:
   ```bash
-  npm run crawl -- https://example.com --query-policy allowlist --query-allowlist page,lang
+  pnpm crawl -- https://example.com --query-policy allowlist --query-allowlist page,lang
   ```
 
 ## Timeouts or Rate Limiting
@@ -60,9 +60,9 @@ Symptoms:
 Action:
 1. Reduce concurrency:
    ```bash
-   npm run crawl -- https://example.com --concurrency 2
+   pnpm crawl -- https://example.com --concurrency 2
    ```
 2. Increase request timeout:
    ```bash
-   npm run crawl -- https://example.com --request-timeout 30000
+   pnpm crawl -- https://example.com --request-timeout 30000
    ```
